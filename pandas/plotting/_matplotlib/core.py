@@ -19,7 +19,6 @@ from typing import (
 )
 import warnings
 
-import matplotlib as mpl
 import numpy as np
 
 from pandas._libs import lib
@@ -54,6 +53,7 @@ from pandas.core.dtypes.generic import (
 )
 from pandas.core.dtypes.missing import isna
 
+import matplotlib as mpl
 import pandas.core.common as com
 
 from pandas.io.formats.printing import pprint_thing
@@ -81,11 +81,6 @@ from pandas.plotting._matplotlib.tools import (
 )
 
 if TYPE_CHECKING:
-    from matplotlib.artist import Artist
-    from matplotlib.axes import Axes
-    from matplotlib.axis import Axis
-    from matplotlib.figure import Figure
-
     from pandas._typing import (
         IndexLabel,
         NDFrameT,
@@ -93,6 +88,10 @@ if TYPE_CHECKING:
         npt,
     )
 
+    from matplotlib.artist import Artist
+    from matplotlib.axes import Axes
+    from matplotlib.axis import Axis
+    from matplotlib.figure import Figure
     from pandas import (
         DataFrame,
         Index,
@@ -1325,9 +1324,11 @@ class ScatterPlot(PlanePlot):
         **kwargs,
     ) -> None:
         if s is None:
-            # hide the matplotlib default for size, in case we want to change
-            # the handling of this argument later
-            s = 20
+            ms = mpl.rcParams.get("lines.markersize", None)
+            if ms is None:
+                s = 20
+            else:
+                s = ms**2
         elif is_hashable(s) and s in data.columns:
             s = data[s]
         self.s = s
